@@ -1,6 +1,6 @@
 package com.wu.serviceconsumer;
 
-import com.yupi.yuapiclientsdk.utils.SignUtils;
+import com.wu.commonapi.utils.SignUtils;
 import com.wu.commonapi.model.entity.InterfaceInfo;
 import com.wu.commonapi.model.entity.User;
 import com.wu.commonapi.service.InnerInterfaceInfoService;
@@ -100,7 +100,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
         // 实际情况中是从数据库中查出 secretKey
         String secretKey = invokeUser.getSecretKey();
-        String serverSign = SignUtils.genSign(body, secretKey);
+        String serverSign = SignUtils.genSign(secretKey);
         if (sign == null || !sign.equals(serverSign)) {
             return handleNoAuth(response);
         }
@@ -111,9 +111,9 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         } catch (Exception e) {
             log.error("getInterfaceInfo error", e);
         }
-        if (interfaceInfo == null) {
-            return handleNoAuth(response);
-        }
+//        if (interfaceInfo == null) {
+//            return handleNoAuth(response);
+//        }
         // todo 是否还有调用次数
         // 5. 请求转发，调用模拟接口 + 响应日志
         //        Mono<Void> filter = chain.filter(exchange);
@@ -155,6 +155,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                                         } catch (Exception e) {
                                             log.error("invokeCount error", e);
                                         }
+
                                         byte[] content = new byte[dataBuffer.readableByteCount()];
                                         dataBuffer.read(content);
                                         DataBufferUtils.release(dataBuffer);//释放掉内存

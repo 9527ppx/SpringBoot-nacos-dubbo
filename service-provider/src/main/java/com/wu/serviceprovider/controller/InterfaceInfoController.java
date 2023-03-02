@@ -14,7 +14,7 @@ import com.wu.serviceprovider.model.dto.interfaceinfo.InterfaceInfoUpdateRequest
 import com.wu.serviceprovider.model.enums.InterfaceInfoStatusEnum;
 import com.wu.serviceprovider.service.InterfaceInfoService;
 import com.wu.serviceprovider.service.UserService;
-import com.yupi.yuapiclientsdk.client.YuApiClient;
+
 import com.wu.commonapi.model.entity.InterfaceInfo;
 import com.wu.commonapi.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +42,6 @@ public class InterfaceInfoController {
     @Resource
     private UserService userService;
 
-    @Resource
-    private YuApiClient yuApiClient;
 
     // region 增删改查
 
@@ -221,12 +219,13 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 判断该接口是否可以调用
-        com.yupi.yuapiclientsdk.model.User user = new com.yupi.yuapiclientsdk.model.User();
-        user.setUsername("test");
-        String username = yuApiClient.getUsernameByPost(user);
-        if (StringUtils.isBlank(username)) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
-        }
+//        com.yupi.yuapiclientsdk.model.User user = new com.yupi.yuapiclientsdk.model.User();
+//        user.setUsername("test");
+//        String username = yuApiClient.getUsernameByPost(user);
+
+//        if (StringUtils.isBlank(username)) {
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+//        }
         // 仅本人或管理员可修改
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setId(id);
@@ -286,14 +285,19 @@ public class InterfaceInfoController {
         if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口已关闭");
         }
-        User loginUser = userService.getLoginUser(request);
-        String accessKey = loginUser.getAccessKey();
-        String secretKey = loginUser.getSecretKey();
-        YuApiClient tempClient = new YuApiClient(accessKey, secretKey);
-        Gson gson = new Gson();
-        com.yupi.yuapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.yupi.yuapiclientsdk.model.User.class);
-        String usernameByPost = tempClient.getUsernameByPost(user);
-        return ResultUtils.success(usernameByPost);
+//        User loginUser = userService.getLoginUser(request);
+//        String accessKey = loginUser.getAccessKey();
+//        String secretKey = loginUser.getSecretKey();
+//        YuApiClient tempClient = new YuApiClient(accessKey, secretKey);
+//
+//        Gson gson = new Gson();
+//        //用户请求参数 string “{”username“：”“}”
+//        com.yupi.yuapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.yupi.yuapiclientsdk.model.User.class);
+//
+//        String usernameByPost = tempClient.getUsernameByPost(user);
+        //传 request interfaceInfoInvokeRequest
+        String s = interfaceInfoService.testInterface(interfaceInfoInvokeRequest, request);
+        return ResultUtils.success(s);
     }
 
 }
